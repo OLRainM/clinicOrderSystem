@@ -1,0 +1,28 @@
+# Maven / Java
+target/
+*.class
+*.war
+*.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Runtime / env
+.env
+application-local.yml
+
+# Local prompt records
+docs/prompts.md

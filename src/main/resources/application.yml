@@ -1,0 +1,28 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: clinic-order-system
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/clinic_order?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: root
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      timeout: 3000ms
+
+clinic:
+  lock-minutes: 10
+  schedule-cache-ttl-minutes: 30
+  privacy-secret: change-me-32bytes-secret-key-0001
