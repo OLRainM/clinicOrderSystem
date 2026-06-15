@@ -1,10 +1,14 @@
 CREATE DATABASE IF NOT EXISTS clinic_order DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE clinic_order;
 
-DROP TABLE IF EXISTS appointment;
+DROP TABLE IF EXISTS prescription_item;
+DROP TABLE IF EXISTS prescription;
+DROP TABLE IF EXISTS stat_daily_doctor;
+DROP TABLE IF EXISTS stat_daily_department;
+DROP TABLE IF EXISTS medical_record;
+DROP TABLE IF EXISTS appointment_order;
 DROP TABLE IF EXISTS schedule_slot;
 DROP TABLE IF EXISTS doctor_schedule;
-DROP TABLE IF EXISTS medical_record;
 DROP TABLE IF EXISTS doctor;
 DROP TABLE IF EXISTS department;
 
@@ -47,25 +51,76 @@ CREATE TABLE schedule_slot (
     CONSTRAINT ck_quota CHECK (available_quota >= 0 AND available_quota <= total_quota)
 );
 
-CREATE TABLE appointment (
+CREATE TABLE appointment_order (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    order_no VARCHAR(40) NOT NULL,
     user_id BIGINT NOT NULL,
     slot_id BIGINT NOT NULL,
-    status VARCHAR(20) NOT NULL COMMENT 'PENDING_PAY/PAID/CLOSED',
+    status TINYINT NOT NULL COMMENT '0待支付 1已支付 2已取消 3已改签',
+    original_order_no VARCHAR(40) NULL,
     lock_expire_time DATETIME NOT NULL,
     paid_at DATETIME NULL,
-    closed_at DATETIME NULL,
+    cancelled_at DATETIME NULL,
+    rescheduled_at DATETIME NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_order_no (order_no),
     KEY idx_user_status (user_id, status),
     KEY idx_slot_status (slot_id, status),
-    CONSTRAINT fk_appointment_slot FOREIGN KEY (slot_id) REFERENCES schedule_slot(id)
+    KEY idx_original_order_no (original_order_no),
+    CONSTRAINT fk_order_slot FOREIGN KEY (slot_id) REFERENCES schedule_slot(id)
 );
 
 CREATE TABLE medical_record (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    order_no VARCHAR(40) NOT NULL,
     user_id BIGINT NOT NULL,
-    appointment_id BIGINT,
-    encrypted_content TEXT NOT NULL COMMENT 'AES加密病历内容',
-    prescription_url VARCHAR(255),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    doctor_id BIGINT NOT NULL,
+    symptoms TEXT NOT NULL,
+    diagnosis TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_user_id (user_id),
+    KEY idx_record_order_no (order_no),
+    CONSTRAINT fk_record_doctor FOREIGN KEY (doctor_id) REFERENCES doctor(id)
+);
+
+CREATE TABLE prescription (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    record_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    status TINYINT NOT NULL DEFAULT 0 COMMENT '0有效 1作废',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_prescription_user (user_id),
+    CONSTRAINT fk_prescription_record FOREIGN KEY (record_id) REFERENCES medical_record(id)
+);
+
+CREATE TABLE prescription_item (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    prescription_id BIGINT NOT NULL,
+    medicine_name VARCHAR(128) NOT NULL,
+    dosage VARCHAR(128) NOT NULL,
+    usage_instruction VARCHAR(255) NOT NULL,
+    CONSTRAINT fk_item_prescription FOREIGN KEY (prescription_id) REFERENCES prescription(id)
+);
+
+CREATE TABLE stat_daily_department (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    stat_date DATE NOT NULL,
+    department_id BIGINT NOT NULL,
+    department_name VARCHAR(64) NOT NULL,
+    visit_count INT NOT NULL DEFAULT 0,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_date_dept (stat_date, department_id)
+);
+
+CREATE TABLE stat_daily_doctor (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    stat_date DATE NOT NULL,
+    doctor_id BIGINT NOT NULL,
+    doctor_name VARCHAR(64) NOT NULL,
+    total_appointments INT NOT NULL DEFAULT 0,
+    completed_appointments INT NOT NULL DEFAULT 0,
+    reception_rate DECIMAL(5,2) NOT NULL DEFAULT 0,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_date_doc (stat_date, doctor_id)
 );

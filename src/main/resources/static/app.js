@@ -42,13 +42,14 @@ async function loadSchedules() {
 
 async function reserve(slotId) {
     const userId = document.getElementById('userId').value;
-    const res = await fetch('/api/appointments/reserve', {
+    await fetch(`/api/auth/mock-login?userId=${userId}&username=patient${userId}&role=PATIENT`, { method: 'POST' });
+    const res = await fetch('/api/order/reserve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: Number(userId), slotId })
+        body: JSON.stringify({ slotId })
     });
     const json = await res.json();
-    alert(json.success ? json.data.message : json.message);
+    alert(json.success ? `${json.data.message}，订单号：${json.data.orderNo}` : json.message);
     loadSchedules();
 }
 

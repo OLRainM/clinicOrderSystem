@@ -198,12 +198,18 @@ curl -X POST http://服务器IP:8080/api/init/redis-quota
 curl "http://服务器IP:8080/clinicOrderSystem/api/schedules?date=2025-01-01"
 ```
 
+先模拟登录获取 Session：
+
+```bash
+curl -c cookie.txt -X POST "http://服务器IP:8080/clinicOrderSystem/api/auth/mock-login?userId=1001&username=patient1001&role=PATIENT"
+```
+
 预约锁号：
 
 ```bash
-curl -X POST http://服务器IP:8080/clinicOrderSystem/api/appointments/reserve \
+curl -b cookie.txt -X POST http://服务器IP:8080/clinicOrderSystem/api/order/reserve \
   -H "Content-Type: application/json" \
-  -d '{"userId":1001,"slotId":1}'
+  -d '{"slotId":1}'
 ```
 
 ## 9. 常见问题
