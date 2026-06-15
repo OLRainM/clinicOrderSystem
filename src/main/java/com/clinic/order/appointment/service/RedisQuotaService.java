@@ -51,4 +51,8 @@ public class RedisQuotaService {
         redisTemplate.opsForValue().increment(scheduleService.quotaKey(slotId));
         redisTemplate.opsForHash().delete(scheduleService.lockKey(slotId), String.valueOf(userId));
     }
+
+    public void unlock(Long userId, Long slotId) {
+        redisTemplate.opsForHash().delete(scheduleService.lockKey(slotId), String.valueOf(userId));
+    }
 }

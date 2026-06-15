@@ -1,6 +1,8 @@
 CREATE DATABASE IF NOT EXISTS clinic_order DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE clinic_order;
 
+DROP TABLE IF EXISTS security_audit_log;
+
 DROP TABLE IF EXISTS prescription_item;
 DROP TABLE IF EXISTS prescription;
 DROP TABLE IF EXISTS stat_daily_doctor;
@@ -101,6 +103,18 @@ CREATE TABLE prescription_item (
     dosage VARCHAR(128) NOT NULL,
     usage_instruction VARCHAR(255) NOT NULL,
     CONSTRAINT fk_item_prescription FOREIGN KEY (prescription_id) REFERENCES prescription(id)
+);
+
+CREATE TABLE security_audit_log (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT,
+    resource_type VARCHAR(64) NOT NULL,
+    resource_id VARCHAR(64) NOT NULL,
+    action VARCHAR(64) NOT NULL,
+    result VARCHAR(16) NOT NULL,
+    reason VARCHAR(255),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_audit_user_time (user_id, created_at)
 );
 
 CREATE TABLE stat_daily_department (

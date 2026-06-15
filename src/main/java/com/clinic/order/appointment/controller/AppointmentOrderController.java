@@ -3,6 +3,7 @@ package com.clinic.order.appointment.controller;
 import com.clinic.order.appointment.dto.ReserveRequest;
 import com.clinic.order.appointment.dto.RescheduleRequest;
 import com.clinic.order.appointment.service.AppointmentOrderService;
+import com.clinic.order.appointment.service.ReserveRateLimit;
 import com.clinic.order.common.dto.ApiResponse;
 import com.clinic.order.common.security.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,8 @@ public class AppointmentOrderController {
     }
 
     @PostMapping("/reserve")
+    @ReserveRateLimit(seconds = 10, maxRequests = 5)
+
     public ApiResponse<Map<String, Object>> reserve(@RequestBody @Valid ReserveRequest request, HttpServletRequest servletRequest) {
         Long userId = SecurityUtils.currentUserId(servletRequest);
         Map<String, Object> result = appointmentOrderService.reserve(userId, request.getSlotId());
@@ -35,6 +38,16 @@ public class AppointmentOrderController {
     @PostMapping("/{orderId}/cancel")
     public ApiResponse<Void> cancel(@PathVariable Long orderId, HttpServletRequest request) {
         return appointmentOrderService.cancel(orderId, SecurityUtils.currentUserId(request)) ? ApiResponse.ok("取消成功", null) : ApiResponse.fail("取消失败");
+    }
+
+    @PostMapping("/no/{orderNo}/pay")
+    public ApiResponse<Void> payByOrderNo(@PathVariable String orderNo, HttpServletRequest request) {
+        return appointmentOrderService.pay(orderNo, SecurityUtils.currentUserId(request)) ? ApiResponse.ok("支付成功", null) : ApiResponse.fail("支付失败或订单已超时");
+    }
+
+    @PostMapping("/no/{orderNo}/cancel")
+    public ApiResponse<Void> cancelByOrderNo(@PathVariable String orderNo, HttpServletRequest request) {
+        return appointmentOrderService.cancel(orderNo, SecurityUtils.currentUserId(request)) ? ApiResponse.ok("取消成功", null) : ApiResponse.fail("取消失败");
     }
 
     @PostMapping("/reschedule")

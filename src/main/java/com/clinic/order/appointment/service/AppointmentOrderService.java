@@ -19,20 +19,22 @@ public class AppointmentOrderService {
     private final AppointmentOrderRepository orderRepository;
     private final ScheduleRepository scheduleRepository;
     private final RedisQuotaService redisQuotaService;
+    private final RefundService refundService;
 
     @Value("${clinic.lock-minutes:10}")
     private long lockMinutes;
 
     public AppointmentOrderService(AppointmentAsyncService asyncService, AppointmentOrderRepository orderRepository,
-                                   ScheduleRepository scheduleRepository, RedisQuotaService redisQuotaService) {
+                                   ScheduleRepository scheduleRepository, RedisQuotaService redisQuotaService,
+                                   RefundService refundService) {
         this.asyncService = asyncService;
         this.orderRepository = orderRepository;
         this.scheduleRepository = scheduleRepository;
         this.redisQuotaService = redisQuotaService;
+        this.refundService = refundService;
     }
 
     public Map<String, Object> reserve(Long userId, Long slotId) {
-        if (!redisQuotaService.acquireRateLimit(userId)) return Map.of("reserved", false, "reason", "请求过于频繁");
         LocalDateTime expireTime = LocalDateTime.now().plusMinutes(lockMinutes);
         long expireMillis = expireTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         Long result = redisQuotaService.deduct(userId, slotId, expireMillis, lockMinutes * 60);
@@ -46,19 +48,47 @@ public class AppointmentOrderService {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean pay(Long orderId, Long userId) {
-        return orderRepository.markPaid(orderId, userId) == 1;
+        Map<String, Object> order = orderRepository.findOwnerOrder(orderId, userId).orElseThrow();
+        boolean paid = orderRepository.markPaid(orderId, userId) == 1;
+        if (paid) afterCommit(() -> redisQuotaService.unlock(userId, (Long) order.get("slotId")));
+        return paid;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean pay(String orderNo, Long userId) {
+        Map<String, Object> order = orderRepository.findOwnerOrder(orderNo, userId).orElseThrow();
+        boolean paid = orderRepository.markPaid(orderNo, userId) == 1;
+        if (paid) afterCommit(() -> redisQuotaService.unlock(userId, (Long) order.get("slotId")));
+        return paid;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public boolean cancel(Long orderId, Long userId) {
         Map<String, Object> order = orderRepository.findOwnerOrder(orderId, userId).orElseThrow();
+        return cancelLoadedOrder(null, orderId, userId, order);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean cancel(String orderNo, Long userId) {
+        Map<String, Object> order = orderRepository.findOwnerOrder(orderNo, userId).orElseThrow();
+        return cancelLoadedOrder(orderNo, null, userId, order);
+    }
+
+    private boolean cancelLoadedOrder(String orderNo, Long orderId, Long userId, Map<String, Object> order) {
         int status = (Integer) order.get("status");
+        Long slotId = (Long) order.get("slotId");
         if (status == AppointmentStatus.PAID.getCode()) {
-            // TODO 对接第三方退款；退款受理成功后再取消。出诊前2小时限制可按slot时间补充。
+            LocalDateTime visitTime = scheduleRepository.findSlotStartDateTime(slotId);
+            if (visitTime.minusHours(2).isBefore(LocalDateTime.now())) {
+                throw new IllegalStateException("距离出诊不足2小时，不能取消已支付预约");
+            }
+            if (!refundService.requestRefund(String.valueOf(order.get("orderNo")), userId)) {
+                throw new IllegalStateException("退款申请失败，取消终止");
+            }
         }
         if (status != AppointmentStatus.PENDING_PAY.getCode() && status != AppointmentStatus.PAID.getCode()) return false;
-        Long slotId = (Long) order.get("slotId");
-        if (orderRepository.cancel(orderId, userId, status) != 1) return false;
+        int updated = orderNo == null ? orderRepository.cancel(orderId, userId, status) : orderRepository.cancel(orderNo, userId, status);
+        if (updated != 1) return false;
         scheduleRepository.increaseMysqlQuota(slotId);
         afterCommit(() -> redisQuotaService.rollback(userId, slotId));
         return true;
@@ -79,7 +109,10 @@ public class AppointmentOrderService {
             if (orderRepository.markRescheduled(oldOrderNo, userId) != 1) throw new IllegalStateException("旧单状态异常");
             if (scheduleRepository.decreaseMysqlQuota(newSlotId) != 1) throw new IllegalStateException("新时段库存不足");
             scheduleRepository.increaseMysqlQuota(oldSlotId);
-            afterCommit(() -> redisQuotaService.rollback(userId, oldSlotId));
+            afterCommit(() -> {
+                redisQuotaService.rollback(userId, oldSlotId);
+                redisQuotaService.unlock(userId, newSlotId);
+            });
             return Map.of("success", true, "newOrderNo", newOrderNo);
         } catch (Exception ex) {
             redisQuotaService.rollback(userId, newSlotId);

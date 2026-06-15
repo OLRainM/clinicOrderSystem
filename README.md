@@ -20,12 +20,14 @@
 4. 预约订单状态机：`appointment_order.status` 使用 `0待支付/1已支付/2已取消/3已改签`
 5. Redis Lua 原子扣减：禁止 Java `GET` 后 `DECR`
 6. 防重复锁号 Hash：`hospital:slot:lock:{slot_id}`，field 为当前 Session 用户ID
-7. 预约限流：`hospital:rate:reserve:{user_id}`
+7. 预约限流：Spring AOP + Redis 计数器 `hospital:rate:reserve:{user_id}`
 8. 异步 JDBC 落库：`@Async("appointmentExecutor")`
 9. 支付、取消与改签接口，其中改签遵循“新建新单、作废旧单”原则
-10. 电子病历查看按 `recordId + Session userId` SQL 级隔离
-11. 处方 PDF 使用 FreeMarker + Flying Saucer 内存流式输出
-12. 数据统计使用 `stat_daily_*` 聚合表和凌晨 2 点 `@Scheduled` 离线聚合
+10. 超时待支付订单自动关闭，并严格回滚 MySQL 与 Redis 号源
+11. 已支付订单取消先执行退款受理，并限制出诊前 2 小时内不可取消
+12. 电子病历查看按 `recordId + Session userId` SQL 级隔离，并记录安全审计日志
+13. 处方 PDF 使用 FreeMarker + Flying Saucer 内存流式输出
+14. 数据统计使用 `stat_daily_*` 聚合表和凌晨 2 点 `@Scheduled` 离线聚合
 
 ## 文档目录
 

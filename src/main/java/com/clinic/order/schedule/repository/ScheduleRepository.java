@@ -53,6 +53,15 @@ public class ScheduleRepository {
             """, slotId);
     }
 
+    public java.time.LocalDateTime findSlotStartDateTime(Long slotId) {
+        return jdbcTemplate.queryForObject("""
+            SELECT TIMESTAMP(ds.schedule_date, ss.start_time)
+            FROM schedule_slot ss JOIN doctor_schedule ds ON ss.schedule_id = ds.id
+            WHERE ss.id = ?
+            """, java.time.LocalDateTime.class, slotId);
+    }
+
+
     private DoctorSchedule mapSchedule(ResultSet rs) throws java.sql.SQLException {
         DoctorSchedule s = new DoctorSchedule();
         s.setId(rs.getLong("id"));

@@ -78,10 +78,34 @@ public class AppointmentOrderRepository {
     }
 
 
+    public int cancel(String orderNo, Long userId, int expectedStatus) {
+        return jdbcTemplate.update("""
+            UPDATE appointment_order SET status = ?, cancelled_at = NOW(), updated_at = NOW()
+            WHERE order_no = ? AND user_id = ? AND status = ?
+            """, AppointmentStatus.CANCELLED.getCode(), orderNo, userId, expectedStatus);
+    }
+
+
     public int markRescheduled(String orderNo, Long userId) {
         return jdbcTemplate.update("""
             UPDATE appointment_order SET status = ?, rescheduled_at = NOW(), updated_at = NOW()
             WHERE order_no = ? AND user_id = ? AND status = ?
             """, AppointmentStatus.RESCHEDULED.getCode(), orderNo, userId, AppointmentStatus.PAID.getCode());
     }
+
+    public java.util.List<Map<String, Object>> findExpiredPending(int limit) {
+        return jdbcTemplate.queryForList("""
+            SELECT id, order_no, user_id, slot_id FROM appointment_order
+            WHERE status = ? AND lock_expire_time <= NOW()
+            ORDER BY id LIMIT ?
+            """, AppointmentStatus.PENDING_PAY.getCode(), limit);
+    }
+
+    public int closeExpired(Long orderId) {
+        return jdbcTemplate.update("""
+            UPDATE appointment_order SET status = ?, cancelled_at = NOW(), updated_at = NOW()
+            WHERE id = ? AND status = ? AND lock_expire_time <= NOW()
+            """, AppointmentStatus.CANCELLED.getCode(), orderId, AppointmentStatus.PENDING_PAY.getCode());
+    }
+
 }
