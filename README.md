@@ -38,6 +38,8 @@
 - 电子病历与处方下载模块：`docs/电子病历与处方下载.md`
 - 数据统计模块：`docs/数据统计.md`
 - 项目完整性与模块功能点报告：`docs/project-completion-report.md`
+- 技术实现说明：`docs/technical-implementation-guide.md`
+
 
 
 
