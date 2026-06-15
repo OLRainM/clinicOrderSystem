@@ -1,6 +1,10 @@
 CREATE DATABASE IF NOT EXISTS clinic_order DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE clinic_order;
 
+DROP TABLE IF EXISTS doctor_profile;
+DROP TABLE IF EXISTS patient_profile;
+DROP TABLE IF EXISTS sys_user;
+
 DROP TABLE IF EXISTS security_audit_log;
 
 DROP TABLE IF EXISTS prescription_item;
@@ -25,6 +29,37 @@ CREATE TABLE doctor (
     name VARCHAR(64) NOT NULL,
     title VARCHAR(64),
     CONSTRAINT fk_doctor_department FOREIGN KEY (department_id) REFERENCES department(id)
+);
+
+CREATE TABLE sys_user (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    phone VARCHAR(11) UNIQUE NOT NULL COMMENT '手机号作为唯一登录凭证',
+    password_hash VARCHAR(64) NOT NULL COMMENT 'BCrypt哈希值',
+    role_type TINYINT NOT NULL COMMENT '1患者 2医生 3管理员',
+    status TINYINT NOT NULL DEFAULT 1 COMMENT '1正常 0禁用',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_phone (phone)
+);
+
+CREATE TABLE patient_profile (
+    user_id BIGINT PRIMARY KEY,
+    real_name VARCHAR(32) NOT NULL,
+    id_card_no VARCHAR(18) UNIQUE NOT NULL,
+    gender TINYINT,
+    birthday DATE,
+    emergency_contact VARCHAR(11),
+    CONSTRAINT fk_patient_user FOREIGN KEY (user_id) REFERENCES sys_user(id)
+);
+
+CREATE TABLE doctor_profile (
+    user_id BIGINT PRIMARY KEY,
+    real_name VARCHAR(32) NOT NULL,
+    department_id BIGINT NOT NULL,
+    title VARCHAR(32) NOT NULL,
+    introduction TEXT,
+    INDEX idx_dept (department_id),
+    CONSTRAINT fk_doctor_user FOREIGN KEY (user_id) REFERENCES sys_user(id),
+    CONSTRAINT fk_doctor_profile_dept FOREIGN KEY (department_id) REFERENCES department(id)
 );
 
 CREATE TABLE doctor_schedule (

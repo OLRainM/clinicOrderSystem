@@ -6,11 +6,15 @@ import com.clinic.order.appointment.service.AppointmentOrderService;
 import com.clinic.order.appointment.service.ReserveRateLimit;
 import com.clinic.order.common.dto.ApiResponse;
 import com.clinic.order.common.security.SecurityUtils;
+import com.clinic.order.common.security.RequireRole;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+
+@RequireRole(1)
 
 @RestController
 @RequestMapping("/api/order")

@@ -39,6 +39,8 @@
 - 数据统计模块：`docs/数据统计.md`
 - 项目完整性与模块功能点报告：`docs/project-completion-report.md`
 - 技术实现说明：`docs/technical-implementation-guide.md`
+- 用户管理与权限控制模块：`docs/用户模块.md`
+
 
 
 

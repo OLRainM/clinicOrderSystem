@@ -3,6 +3,18 @@ USE clinic_order;
 INSERT INTO department(id, name) VALUES
 (1, '内科'), (2, '儿科'), (3, '口腔科');
 
+INSERT INTO sys_user(id, phone, password_hash, role_type, status) VALUES
+(1001, '18800000001', '$2a$10$cAhaDTF5eURG0YapZUK5n.CoNvAgXUOyK5SRqX.TdQn2fEVZKoL76', 1, 1),
+(2001, '18800000002', '$2a$10$ihkcvmpKvIqLK4kcSOAPcu9tw0h1R3/6acTSzbDkBfHdZCRHqjAIi', 2, 1),
+(9001, '18800000003', '$2a$10$pjHUBL9hL5.c32/k3H9dF.7GexRL3ktC0oMpzSQnR2/JbB8ueDAz.', 3, 1);
+
+INSERT INTO patient_profile(user_id, real_name, id_card_no, gender, birthday, emergency_contact) VALUES
+(1001, '演示患者', '110101199001010011', 1, '1990-01-01', '18800000009');
+
+INSERT INTO doctor_profile(user_id, real_name, department_id, title, introduction) VALUES
+(2001, '演示医生', 1, '主任医师', '擅长内科常见病诊疗');
+
+
 INSERT INTO doctor(id, department_id, name, title) VALUES
 (1, 1, '张医生', '主任医师'),
 (2, 1, '李医生', '副主任医师'),

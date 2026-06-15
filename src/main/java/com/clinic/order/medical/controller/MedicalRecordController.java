@@ -2,11 +2,15 @@ package com.clinic.order.medical.controller;
 
 import com.clinic.order.common.dto.ApiResponse;
 import com.clinic.order.common.security.SecurityUtils;
+import com.clinic.order.common.security.RequireRole;
+
 import com.clinic.order.medical.service.MedicalRecordService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+
+@RequireRole(1)
 
 @RestController
 @RequestMapping("/api/medical-records")

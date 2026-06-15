@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>管理后台</title><link rel="stylesheet" href="/clinic-ui.css"><script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script></head>
 <body><header class="app-header"><div class="brand">管理后台</div><nav class="nav"><a href="/">首页</a><a onclick="adminLogin()">模拟管理员登录</a></nav></header>
-<div class="layout"><aside class="sidebar"><a class="side-link active" href="/admin/dashboard">Dashboard</a><a class="side-link" href="/admin/schedule/manage">排班管理</a><a class="side-link">医生管理</a><a class="side-link">财务流水</a></aside>
+<div class="layout"><aside class="sidebar"><a class="side-link active" href="/admin/dashboard">Dashboard</a><a class="side-link" href="/admin/schedule/manage">排班管理</a><a class="side-link" href="/admin/doctor/manage">医生管理</a><a class="side-link" href="/admin/finance">财务流水</a></aside>
 <main class="main"><div class="toolbar"><h2>经营数据大屏</h2><button class="btn secondary" onclick="loadStats(7)">近7天</button><button class="btn secondary" onclick="loadStats(30)">近30天</button><button class="btn" onclick="aggregateToday()">手动聚合今日</button></div><div class="stats-grid"><div class="card"><h3>科室就诊量</h3><div id="deptChart" class="chart"></div></div><div class="card"><h3>医生接诊率</h3><div id="doctorChart" class="chart"></div></div></div></main></div>
 <script src="/admin.js"></script></body></html>

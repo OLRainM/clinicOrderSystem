@@ -1,6 +1,8 @@
 package com.clinic.order.prescription.controller;
 
 import com.clinic.order.common.security.SecurityUtils;
+import com.clinic.order.common.security.RequireRole;
+
 import com.clinic.order.prescription.service.PdfRenderService;
 import com.clinic.order.prescription.service.PrescriptionService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+
+@RequireRole(1)
 
 @RestController
 @RequestMapping("/api/prescriptions")

@@ -1,6 +1,8 @@
 package com.clinic.order.stats.controller;
 
 import com.clinic.order.common.dto.ApiResponse;
+import com.clinic.order.common.security.RequireRole;
+
 import com.clinic.order.stats.service.StatsService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+
+@RequireRole(3)
 
 @RestController
 @RequestMapping("/admin/api/stats")
