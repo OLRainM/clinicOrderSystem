@@ -1,0 +1,5 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>医生工作台</title><link rel="stylesheet" href="/clinic-ui.css"><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script></head>
+<body><header class="app-header"><div class="brand">医生单页面工作台</div><nav class="nav"><a href="/">首页</a><a onclick="doctorLogin()">模拟医生登录</a></nav></header>
+<main class="container doctor-workspace"><aside><h3>候诊队列</h3><div id="queue"></div></aside><section class="card"><h2 id="patientName">请选择患者</h2><p class="muted" id="patientMeta">左侧点击患者后，右侧 AJAX 局部渲染病史与今日挂号。</p><textarea id="symptoms" rows="4" style="width:100%" placeholder="主诉症状"></textarea><textarea id="diagnosis" rows="4" style="width:100%;margin-top:10px" placeholder="诊断结果"></textarea><textarea id="prescription" rows="4" style="width:100%;margin-top:10px" placeholder="处方：药品/剂量/用法"></textarea><button class="btn success" style="margin-top:12px" onclick="finishVisit()">完结问诊</button></section></main>
+<script src="/doctor.js"></script></body></html>
