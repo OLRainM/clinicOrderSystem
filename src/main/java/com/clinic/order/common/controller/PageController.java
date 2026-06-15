@@ -1,4 +1,4 @@
-package com.clinic.order.common.config;
+package com.clinic.order.common.controller;
 
 import com.clinic.order.common.security.RequireRole;
 

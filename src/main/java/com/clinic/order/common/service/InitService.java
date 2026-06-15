@@ -1,4 +1,4 @@
-package com.clinic.order.common.config;
+package com.clinic.order.common.service;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;

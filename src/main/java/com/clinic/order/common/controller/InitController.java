@@ -1,6 +1,7 @@
-package com.clinic.order.common.config;
+package com.clinic.order.common.controller;
 
 import com.clinic.order.common.dto.ApiResponse;
+import com.clinic.order.common.service.InitService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;

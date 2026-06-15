@@ -1,4 +1,4 @@
-package com.clinic.order.common.config;
+package com.clinic.order.common.exception;
 
 import com.clinic.order.common.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
