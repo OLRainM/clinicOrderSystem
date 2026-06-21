@@ -14,7 +14,13 @@ public class PageController {
 
     @GetMapping({"/schedule", "/department/{id}"})
     public String departmentPage(@PathVariable(required = false) Long id, Model model) {
-        model.addAttribute("departmentId", id == null ? 1 : id);
+        Long departmentId = id == null ? 1 : id;
+        model.addAttribute("departmentId", departmentId);
+        model.addAttribute("departmentName", switch (departmentId.intValue()) {
+            case 2 -> "儿科";
+            case 3 -> "口腔科";
+            default -> "内科";
+        });
         return "department";
     }
 

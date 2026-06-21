@@ -1,7 +1,8 @@
-async function adminLogin(){await fetch('/api/auth/mock-login?userId=9001&username=admin&role=ADMIN',{method:'POST'});Swal.fire('管理员已登录','','success');}
+async function ensureAdmin(){await fetch('/api/auth/mock-login?userId=9001&username=admin&role=ADMIN',{method:'POST'});}
+async function manualAdminLogin(){await ensureAdmin();Swal.fire('登录状态已刷新','当前管理员：9001','success');}
 function fmt(d){return d.toISOString().substring(0,10);}function range(days){const end=new Date();const start=new Date();start.setDate(end.getDate()-days+1);return{start:fmt(start),end:fmt(end)};}
-async function aggregateToday(){await adminLogin();const d=fmt(new Date());const res=await fetch(`/admin/api/stats/aggregate?date=${d}`,{method:'POST'});const json=await res.json();Swal.fire(json.success?'聚合完成':'聚合失败',json.message,json.success?'success':'error');loadStats(7);}
-async function loadStats(days){await adminLogin();const r=range(days);const dept=await (await fetch(`/admin/api/stats/department?start=${r.start}&end=${r.end}`)).json();const doc=await (await fetch(`/admin/api/stats/doctor?start=${r.start}&end=${r.end}`)).json();renderDept(dept.data||[]);renderDoctor(doc.data||[]);}
+async function aggregateToday(){await ensureAdmin();const d=fmt(new Date());const res=await fetch(`/admin/api/stats/aggregate?date=${d}`,{method:'POST'});const json=await res.json();Swal.fire(json.success?'聚合完成':'聚合失败',json.message,json.success?'success':'error');loadStats(7);}
+async function loadStats(days){await ensureAdmin();const r=range(days);const dept=await (await fetch(`/admin/api/stats/department?start=${r.start}&end=${r.end}`)).json();const doc=await (await fetch(`/admin/api/stats/doctor?start=${r.start}&end=${r.end}`)).json();renderDept(dept.data||[]);renderDoctor(doc.data||[]);}
 function renderDept(data){const chart=echarts.init(document.getElementById('deptChart'));chart.setOption({tooltip:{},xAxis:{type:'category',data:data.map(x=>x.department_name||x.departmentName||'未知')},yAxis:{type:'value'},series:[{type:'bar',data:data.map(x=>x.visit_count||x.visitCount||0),itemStyle:{color:'#2563eb'}}]});}
 function renderDoctor(data){const chart=echarts.init(document.getElementById('doctorChart'));chart.setOption({tooltip:{},xAxis:{type:'category',data:data.map(x=>x.doctor_name||x.doctorName||'医生')},yAxis:{type:'value'},series:[{type:'line',data:data.map(x=>x.reception_rate||x.receptionRate||0),smooth:true,itemStyle:{color:'#16a34a'}}]});}
-loadStats(7);
+ensureAdmin().then(()=>loadStats(7));

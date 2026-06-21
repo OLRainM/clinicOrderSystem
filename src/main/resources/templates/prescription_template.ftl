@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <style>
-        body { font-family: SimSun, serif; color: #111; }
+        body { font-family: SimSun, "Microsoft YaHei", "Noto Sans CJK SC", serif; color: #111; line-height: 1.6; }
+        .prescription { width: 680px; margin: 0 auto; }
         .title { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 16px; }
         .meta { margin-bottom: 12px; line-height: 1.8; }
         table { width: 100%; border-collapse: collapse; margin-top: 12px; }
@@ -13,6 +14,7 @@
     </style>
 </head>
 <body>
+<div class="prescription">
 <div class="title">诊所处方笺</div>
 <div class="meta">
     患者：${patientName!''}<br/>
@@ -37,5 +39,6 @@
     </tbody>
 </table>
 <div class="footer">医生签名：${doctorName!''}</div>
+</div>
 </body>
 </html>

@@ -8,6 +8,9 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -23,13 +26,28 @@ public class PdfRenderService {
         StringWriter writer = new StringWriter();
         template.process(data, writer);
         ITextRenderer renderer = new ITextRenderer();
-        ClassPathResource font = new ClassPathResource("fonts/simsun.ttf");
-        if (font.exists()) {
-            renderer.getFontResolver().addFont(font.getFile().getAbsolutePath(), "Identity-H", true);
+        for (String fontPath : candidateFonts()) {
+            if (!fontPath.isBlank() && Files.isRegularFile(Path.of(fontPath))) {
+                renderer.getFontResolver().addFont(fontPath, "Identity-H", true);
+                break;
+            }
         }
         renderer.setDocumentFromString(writer.toString());
         renderer.layout();
         renderer.createPDF(outputStream);
         outputStream.flush();
     }
+
+    private List<String> candidateFonts() throws Exception {
+        ClassPathResource bundled = new ClassPathResource("fonts/simsun.ttf");
+        return List.of(
+                bundled.exists() ? bundled.getFile().getAbsolutePath() : "",
+                "C:/Windows/Fonts/simsun.ttc",
+                "C:/Windows/Fonts/simhei.ttf",
+                "C:/Windows/Fonts/msyh.ttc",
+                "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
+                "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+        );
+    }
+
 }
