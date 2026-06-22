@@ -1,8 +1,12 @@
 package com.clinic.order.admin.repository;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -56,9 +60,19 @@ public class AdminRepository {
             """, date, date);
     }
 
-    public int createSchedule(Long doctorId, Long departmentId, LocalDate date, String period) {
-        return jdbcTemplate.update("INSERT INTO doctor_schedule(doctor_id,department_id,schedule_date,period) VALUES (?,?,?,?)",
-                doctorId, departmentId, date, period);
+    public Long createSchedule(Long doctorId, Long departmentId, LocalDate date, String period) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(conn -> {
+            PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO doctor_schedule(doctor_id,department_id,schedule_date,period) VALUES (?,?,?,?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, doctorId);
+            ps.setLong(2, departmentId);
+            ps.setObject(3, date);
+            ps.setString(4, period);
+            return ps;
+        }, keyHolder);
+        return keyHolder.getKey() == null ? null : keyHolder.getKey().longValue();
     }
 
     public int updateSchedule(Long id, Long doctorId, Long departmentId, LocalDate date, String period) {
@@ -76,6 +90,23 @@ public class AdminRepository {
             INSERT INTO schedule_slot(schedule_id,start_time,end_time,total_quota,available_quota,version)
             VALUES (?,?,?,?,?,0)
             """, scheduleId, Time.valueOf(startTime), Time.valueOf(endTime), totalQuota, totalQuota);
+    }
+
+    public List<Map<String, Object>> scheduleSlots(Long scheduleId) {
+        return jdbcTemplate.queryForList("""
+            SELECT id, schedule_id, start_time, end_time, total_quota, available_quota
+            FROM schedule_slot
+            WHERE schedule_id = ?
+            ORDER BY start_time
+            """, scheduleId);
+    }
+
+    public int updateSlotQuota(Long slotId, Integer totalQuota) {
+        return jdbcTemplate.update("""
+            UPDATE schedule_slot
+            SET total_quota = ?, available_quota = LEAST(available_quota, ?)
+            WHERE id = ?
+            """, totalQuota, totalQuota, slotId);
     }
 
     public int deleteSlot(Long slotId) {

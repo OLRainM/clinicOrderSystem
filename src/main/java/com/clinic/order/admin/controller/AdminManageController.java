@@ -55,9 +55,9 @@ public class AdminManageController {
     }
 
     @PostMapping("/schedules")
-    public ApiResponse<Void> createSchedule(@RequestBody Map<String, Object> req) {
-        repository.createSchedule(num(req, "doctorId"), num(req, "departmentId"), LocalDate.parse(str(req, "scheduleDate")), str(req, "period"));
-        return ApiResponse.ok("排班已新增", null);
+    public ApiResponse<Map<String, Object>> createSchedule(@RequestBody Map<String, Object> req) {
+        Long scheduleId = repository.createSchedule(num(req, "doctorId"), num(req, "departmentId"), LocalDate.parse(str(req, "scheduleDate")), str(req, "period"));
+        return ApiResponse.ok("排班已新增", Map.of("scheduleId", scheduleId));
     }
 
     @PutMapping("/schedules/{id}")
@@ -72,10 +72,36 @@ public class AdminManageController {
         return ApiResponse.ok("排班已删除", null);
     }
 
+    @GetMapping("/schedules/{id}/slots")
+    public ApiResponse<List<Map<String, Object>>> scheduleSlots(@PathVariable Long id) {
+        return ApiResponse.ok("查询成功", repository.scheduleSlots(id));
+    }
+
+    @PostMapping("/schedules/with-slots")
+    @SuppressWarnings("unchecked")
+    public ApiResponse<Map<String, Object>> createScheduleWithSlots(@RequestBody Map<String, Object> req) {
+        Long scheduleId = repository.createSchedule(num(req, "doctorId"), num(req, "departmentId"), LocalDate.parse(str(req, "scheduleDate")), str(req, "period"));
+        List<Map<String, Object>> slots = (List<Map<String, Object>>) req.get("slots");
+        if (slots != null) {
+            for (Map<String, Object> slot : slots) {
+                repository.createSlot(scheduleId, LocalTime.parse(String.valueOf(slot.get("startTime"))), LocalTime.parse(String.valueOf(slot.get("endTime"))), Integer.valueOf(String.valueOf(slot.get("totalQuota"))));
+            }
+        }
+        return ApiResponse.ok("排班和时段已新增", Map.of("scheduleId", scheduleId));
+    }
+
+
     @PostMapping("/slots")
     public ApiResponse<Void> createSlot(@RequestBody Map<String, Object> req) {
         repository.createSlot(num(req, "scheduleId"), LocalTime.parse(str(req, "startTime")), LocalTime.parse(str(req, "endTime")), integer(req, "totalQuota"));
         return ApiResponse.ok("时段已新增", null);
+    }
+
+
+    @PutMapping("/slots/{slotId}")
+    public ApiResponse<Void> updateSlotQuota(@PathVariable Long slotId, @RequestBody Map<String, Object> req) {
+        repository.updateSlotQuota(slotId, integer(req, "totalQuota"));
+        return ApiResponse.ok("号源数量已更新", null);
     }
 
     @DeleteMapping("/slots/{slotId}")
