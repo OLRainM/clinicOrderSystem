@@ -31,12 +31,14 @@ src/main/java/com/clinic/order
     security     Token 鉴权、RBAC 注解、安全工具、审计日志
     service      通用初始化服务
     util         AES 隐私加密工具
-  user           用户账号、患者/医生档案、登录注册、Redis Token
-  schedule       医生排班、时段号源、排班查询
-  appointment    预约、支付、取消、改签、超时回滚、限流
-  medical        电子病历查看与 Owner 鉴权
-  prescription   处方数据聚合与 PDF 下载
-  stats          后台统计、离线聚合、管理端统计接口
+  admin         管理员端：秘钥登录后的医生管理、排班管理、后台接口
+  user          患者账号、患者注册登录、Redis Token
+  doctor        医生端：医生登录、候诊队列、问诊完结、病历/处方生成
+  schedule      医生排班、时段号源、排班查询
+  appointment   预约、支付、取消、改签、超时回滚、限流
+  medical       电子病历查看与 Owner 鉴权
+  prescription  处方数据聚合与 PDF 下载
+  stats         后台统计、离线聚合、管理端统计接口
 ```
 
 ## 已实现功能
