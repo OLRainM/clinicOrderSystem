@@ -31,6 +31,10 @@ public class PageController {
     @GetMapping("/user/dashboard")
     public String userDashboard() { return "user-dashboard"; }
 
+    @GetMapping("/doctor")
+    public String doctorHome() { return "doctor-home"; }
+
+
     @GetMapping("/login/doctor")
     public String doctorLogin() { return "login"; }
 
