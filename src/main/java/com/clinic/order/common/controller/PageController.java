@@ -36,7 +36,7 @@ public class PageController {
 
 
     @GetMapping("/login/doctor")
-    public String doctorLogin() { return "login"; }
+    public String doctorLogin() { return "doctor-login"; }
 
     @RequireRole(2)
     @GetMapping("/doctor/workspace")
