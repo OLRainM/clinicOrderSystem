@@ -46,6 +46,6 @@ public class PageController {
     public String adminLogin() { return "admin-login"; }
 
     @RequireRole(3)
-    @GetMapping({"/admin/dashboard", "/admin/schedule/manage", "/admin/doctor/manage", "/admin/finance"})
+    @GetMapping({"/admin/dashboard", "/admin/schedule/manage", "/admin/doctor/manage", "/admin/department/manage", "/admin/finance"})
     public String adminDashboard() { return "admin-dashboard"; }
 }

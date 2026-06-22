@@ -26,6 +26,25 @@ public class AdminManageController {
         return ApiResponse.ok("查询成功", repository.departments());
     }
 
+    @PostMapping("/departments")
+    public ApiResponse<Void> createDepartment(@RequestBody Map<String, Object> req) {
+        repository.createDepartment(str(req, "name"));
+        return ApiResponse.ok("科室已新增", null);
+    }
+
+    @PutMapping("/departments/{id}")
+    public ApiResponse<Void> updateDepartment(@PathVariable Long id, @RequestBody Map<String, Object> req) {
+        repository.updateDepartment(id, str(req, "name"));
+        return ApiResponse.ok("科室已更新", null);
+    }
+
+    @DeleteMapping("/departments/{id}")
+    public ApiResponse<Void> deleteDepartment(@PathVariable Long id) {
+        repository.deleteDepartment(id);
+        return ApiResponse.ok("科室已删除", null);
+    }
+
+
     @GetMapping("/doctors")
     public ApiResponse<List<Map<String, Object>>> doctors() {
         return ApiResponse.ok("查询成功", repository.doctors());

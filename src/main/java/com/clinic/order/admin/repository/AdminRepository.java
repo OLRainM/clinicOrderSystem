@@ -25,6 +25,19 @@ public class AdminRepository {
         return jdbcTemplate.queryForList("SELECT id,name FROM department ORDER BY id");
     }
 
+    public int createDepartment(String name) {
+        return jdbcTemplate.update("INSERT INTO department(name) VALUES (?)", name);
+    }
+
+    public int updateDepartment(Long id, String name) {
+        return jdbcTemplate.update("UPDATE department SET name=? WHERE id=?", name, id);
+    }
+
+    public int deleteDepartment(Long id) {
+        return jdbcTemplate.update("DELETE FROM department WHERE id=?", id);
+    }
+
+
     public List<Map<String, Object>> doctors() {
         return jdbcTemplate.queryForList("""
             SELECT d.id,d.department_id,d.name,d.title,dep.name department_name
