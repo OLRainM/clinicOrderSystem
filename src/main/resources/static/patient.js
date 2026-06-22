@@ -8,7 +8,7 @@ const fallbackDoctors={
   '2':[{doctorName:'王医生',departmentName:'儿科'}],
   '3':[{doctorName:'赵医生',departmentName:'口腔科'}]
 };
-async function ensurePatient(){await fetch('/api/auth/mock-login?userId=1001&username=patient1001&role=PATIENT',{method:'POST'});}
+async function ensurePatient(){const res=await fetch('/api/auth/me');const json=await res.json();if(!json.success||json.data.roleType!==1){location.href='/login';throw new Error('未登录');}}
 async function loadDepartmentSchedules(){
   const dep=document.body.dataset.departmentId;const date=dateInput.value;const grid=document.getElementById('doctorGrid');
   if(date<today){grid.innerHTML='<div class="card">不能查询或预约过去日期的号源，请选择今天或未来日期。</div>';return;}

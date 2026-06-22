@@ -93,6 +93,23 @@ public class AppointmentOrderRepository {
             """, AppointmentStatus.RESCHEDULED.getCode(), orderNo, userId, AppointmentStatus.PAID.getCode());
     }
 
+    public java.util.List<Map<String, Object>> findOwnerOrders(Long userId) {
+        return jdbcTemplate.queryForList("""
+            SELECT ao.order_no, ao.status, ao.created_at, ao.paid_at, ao.cancelled_at,
+                   ds.schedule_date, ds.period, ss.start_time, ss.end_time,
+                   d.name doctor_name, dep.name department_name
+            FROM appointment_order ao
+            JOIN schedule_slot ss ON ao.slot_id = ss.id
+            JOIN doctor_schedule ds ON ss.schedule_id = ds.id
+            JOIN doctor d ON ds.doctor_id = d.id
+            JOIN department dep ON ds.department_id = dep.id
+            WHERE ao.user_id = ?
+            ORDER BY ao.created_at DESC
+            LIMIT 100
+            """, userId);
+    }
+
+
     public java.util.List<Map<String, Object>> findExpiredPending(int limit) {
         return jdbcTemplate.queryForList("""
             SELECT id, order_no, user_id, slot_id FROM appointment_order

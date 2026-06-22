@@ -26,3 +26,6 @@ clinic:
   lock-minutes: 10
   schedule-cache-ttl-minutes: 30
   privacy-secret: change-me-32bytes-secret-key-0001
+
+  admin:
+    secret-key: ClinicAdmin@2026

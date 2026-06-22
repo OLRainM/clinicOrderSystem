@@ -39,7 +39,7 @@ public class PageController {
     public String doctorWorkspace() { return "doctor-workspace"; }
 
     @GetMapping("/admin/login")
-    public String adminLogin() { return "login"; }
+    public String adminLogin() { return "admin-login"; }
 
     @RequireRole(3)
     @GetMapping({"/admin/dashboard", "/admin/schedule/manage", "/admin/doctor/manage", "/admin/finance"})

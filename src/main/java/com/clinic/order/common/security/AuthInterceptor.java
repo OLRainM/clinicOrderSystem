@@ -49,7 +49,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (isAjax(request)) {
             write(response, status, message);
         } else {
-            response.sendRedirect("/login");
+            response.sendRedirect(request.getRequestURI().startsWith("/admin/") ? "/admin/login" : "/login");
         }
         return false;
     }

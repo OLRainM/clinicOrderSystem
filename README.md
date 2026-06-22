@@ -87,22 +87,34 @@ src/main/java/com/clinic/order
    ```
 5. 访问首页：`http://localhost:8080/`
 
-## 演示账号
+## 演示账号与管理秘钥
 
-| 角色 | 手机号 | 密码 | 登录后页面 |
-| --- | --- | --- | --- |
-| 患者 | `18800000001` | `Patient@123` | `/user/dashboard` |
-| 医生 | `18800000002` | `Doctor@123` | `/doctor/workspace` |
-| 管理员 | `18800000003` | `Admin@123` | `/admin/dashboard` |
+| 入口 | 凭证 | 说明 |
+| --- | --- | --- |
+| 患者登录 `/login` | `18800000001 / Patient@123` | 患者端仅用于预约和过往预约查询 |
+| 患者注册 `/login` | 手机号、密码、实名档案 | 注册后自动登录患者中心 |
+| 管理员登录 `/admin/login` | 秘钥：`ClinicAdmin@2026` | 管理员系统已与普通账号登录分离 |
+
+管理员秘钥可通过配置修改：
+
+```yaml
+clinic:
+  admin:
+    secret-key: ClinicAdmin@2026
+```
+
+管理员系统支持：排班管理、时段号源管理、医生增删改查、经营数据统计。
 
 ## 常用入口
 
-- 登录页：`/login`
+- 登录/注册页：`/login`
+- 管理员秘钥登录页：`/admin/login`
 - 门户首页：`/`
 - 科室医生列表：`/department/1`
 - 患者中心：`/user/dashboard`
-- 医生工作台：`/doctor/workspace`
 - 管理后台：`/admin/dashboard`
+- 排班管理：`/admin/schedule/manage`
+- 医生管理：`/admin/doctor/manage`
 
 ## 构建 WAR
 

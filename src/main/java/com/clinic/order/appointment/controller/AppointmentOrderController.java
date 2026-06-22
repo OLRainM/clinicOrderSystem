@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RequireRole(1)
@@ -24,6 +25,12 @@ public class AppointmentOrderController {
     public AppointmentOrderController(AppointmentOrderService appointmentOrderService) {
         this.appointmentOrderService = appointmentOrderService;
     }
+
+    @GetMapping("/my")
+    public ApiResponse<List<Map<String, Object>>> myOrders(HttpServletRequest request) {
+        return ApiResponse.ok("查询成功", appointmentOrderService.listMyOrders(SecurityUtils.currentUserId(request)));
+    }
+
 
     @PostMapping("/reserve")
     @ReserveRateLimit(seconds = 10, maxRequests = 5)

@@ -47,4 +47,9 @@ public class UserService {
         if (user.getStatus() == null || user.getStatus() != 1) throw new IllegalStateException("账号已被禁用");
         return user;
     }
+
+    public SysUser findAdminUser() {
+        return userRepository.findFirstAdmin().orElseThrow(() -> new IllegalStateException("管理员账号未初始化"));
+    }
+
 }

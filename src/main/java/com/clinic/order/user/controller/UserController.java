@@ -9,6 +9,8 @@ import com.clinic.order.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -17,6 +19,10 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class UserController {
     private final UserService userService;
+    @Value("${clinic.admin.secret-key:ClinicAdmin@2026}")
+    private String adminSecretKey;
+
+
     private final AuthTokenService tokenService;
 
     public UserController(UserService userService, AuthTokenService tokenService) {
@@ -29,16 +35,22 @@ public class UserController {
         return ApiResponse.ok("患者注册成功", Map.of("userId", userService.registerPatient(req)));
     }
 
-    @PostMapping("/register/doctor")
-    public ApiResponse<Map<String, Object>> registerDoctor(@RequestBody @Valid DoctorRegisterRequest req) {
-        return ApiResponse.ok("医生注册成功", Map.of("userId", userService.registerDoctor(req)));
-    }
-
     @PostMapping("/login")
     public ApiResponse<SessionUser> login(@RequestBody @Valid LoginRequest req, HttpServletResponse response) {
         SysUser user = userService.login(req.getPhone(), req.getPassword());
         tokenService.issueToken(user.getId(), response);
         return ApiResponse.ok("登录成功", new SessionUser(user.getId(), user.getPhone(), user.getRoleType()));
+    }
+
+    @PostMapping("/admin-key-login")
+    public ApiResponse<SessionUser> adminKeyLogin(@RequestBody @Valid AdminKeyLoginRequest req,
+                                                   HttpServletResponse response) {
+        if (!adminSecretKey.equals(req.getSecretKey())) {
+            return ApiResponse.fail("管理员秘钥错误");
+        }
+        SysUser admin = userService.findAdminUser();
+        tokenService.issueToken(admin.getId(), response);
+        return ApiResponse.ok("管理员登录成功", new SessionUser(admin.getId(), admin.getPhone(), admin.getRoleType()));
     }
 
 

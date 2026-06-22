@@ -11,6 +11,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -44,6 +45,10 @@ public class AppointmentOrderService {
         String orderNo = OrderNoGenerator.next();
         asyncService.createPendingOrder(orderNo, userId, slotId, expireTime);
         return Map.of("reserved", true, "orderNo", orderNo, "message", "抢号成功，请在10分钟内支付");
+    }
+
+    public List<Map<String, Object>> listMyOrders(Long userId) {
+        return orderRepository.findOwnerOrders(userId);
     }
 
     @Transactional(rollbackFor = Exception.class)
