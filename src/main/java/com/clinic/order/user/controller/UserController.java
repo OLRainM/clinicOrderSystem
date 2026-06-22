@@ -35,12 +35,11 @@ public class UserController {
         return ApiResponse.ok("患者注册成功", Map.of("userId", userService.registerPatient(req)));
     }
 
-    @PostMapping("/login")
-    public ApiResponse<SessionUser> login(@RequestBody @Valid LoginRequest req, HttpServletResponse response) {
-        SysUser user = userService.login(req.getPhone(), req.getPassword());
-        tokenService.issueToken(user.getId(), response);
-        return ApiResponse.ok("登录成功", new SessionUser(user.getId(), user.getPhone(), user.getRoleType()));
+    @PostMapping("/register/doctor")
+    public ApiResponse<Map<String, Object>> registerDoctor(@RequestBody @Valid DoctorRegisterRequest req) {
+        return ApiResponse.ok("医生注册成功", Map.of("userId", userService.registerDoctor(req)));
     }
+
 
     @PostMapping("/admin-key-login")
     public ApiResponse<SessionUser> adminKeyLogin(@RequestBody @Valid AdminKeyLoginRequest req,
@@ -51,6 +50,13 @@ public class UserController {
         SysUser admin = userService.findAdminUser();
         tokenService.issueToken(admin.getId(), response);
         return ApiResponse.ok("管理员登录成功", new SessionUser(admin.getId(), admin.getPhone(), admin.getRoleType()));
+    }
+
+    @PostMapping("/login")
+    public ApiResponse<SessionUser> login(@RequestBody @Valid LoginRequest req, HttpServletResponse response) {
+        SysUser user = userService.login(req.getPhone(), req.getPassword());
+        tokenService.issueToken(user.getId(), response);
+        return ApiResponse.ok("登录成功", new SessionUser(user.getId(), user.getPhone(), user.getRoleType()));
     }
 
 

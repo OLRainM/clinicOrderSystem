@@ -59,8 +59,7 @@ public class UserRepository {
     }
 
     public Optional<SysUser> findFirstAdmin() {
-        return jdbcTemplate.query("SELECT * FROM sys_user WHERE role_type = 3 AND status = 1 ORDER BY id LIMIT 1",
-                rs -> rs.next() ? Optional.of(map(rs)) : Optional.empty());
+        return jdbcTemplate.query("SELECT * FROM sys_user WHERE role_type = 3 AND status = 1 ORDER BY id LIMIT 1", rs -> rs.next() ? Optional.of(map(rs)) : Optional.empty());
     }
 
 

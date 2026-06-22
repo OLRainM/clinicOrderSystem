@@ -3,9 +3,9 @@
 <meta charset="UTF-8"><title>${departmentName}医生与排班</title>
 <link rel="stylesheet" href="/clinic-ui.css"><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head><body data-department-id="${departmentId}">
-<header class="app-header"><div class="brand">云诊所 Clinic</div><nav class="nav"><a href="/">首页</a><a href="/user/dashboard">个人中心</a></nav></header>
+<header class="app-header"><div class="brand">云诊所患者端</div><nav class="nav"><a href="/">首页</a><a href="/user/dashboard">个人中心</a></nav></header>
 <main class="container"><div class="toolbar"><h2>${departmentName}医生与排班</h2><label>预约日期 <input id="date" type="date"></label><button class="btn" onclick="loadDepartmentSchedules()">刷新号源</button></div><div class="easy-tip">操作提示：点击医生卡片即可查看全部时间段；蓝色表示可预约，黑色表示暂无号源。</div>
 <div id="doctorGrid" class="grid"></div></main>
 <div id="scheduleModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:20;align-items:center;justify-content:center"><div class="card" style="width:min(760px,92vw);max-height:80vh;overflow:auto"><div style="display:flex;justify-content:space-between"><h3 id="modalTitle">医生排班</h3><button class="btn secondary" onclick="closeScheduleModal()">关闭</button></div><div id="slotList"></div></div></div>
-<script src="/patient.js"></script>
+<script src="/role-nav.js"></script><script src="/patient.js"></script><script>renderRoleNav();</script>
 </body></html>
